@@ -1,4 +1,6 @@
 /*
+ * Copyright OAI Software Alliance
+ * Author Raphael
  * Comments
  */
 #include <stdio.h>
