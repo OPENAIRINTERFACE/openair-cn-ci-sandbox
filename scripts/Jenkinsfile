@@ -1,0 +1,16 @@
+pipeline {
+    agent any
+    options {
+        disableConcurrentBuilds()
+        timestamps()
+    }
+    
+    stages {
+        stage ('Verify Parameters') {
+            steps {
+                echo 'Verify Parameters'
+                echo "Base URL is ${JENKINS_URL}"
+            }
+        }
+    }
+}
