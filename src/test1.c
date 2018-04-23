@@ -1,7 +1,7 @@
 /*
  * Copyright OAI Software Alliance
- * Author Raphael
- * Comments
+ * Author Raphael Defosseux
+ * Comments 
  */
 #include <stdio.h>
 
