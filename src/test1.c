@@ -1,3 +1,8 @@
+/*
+ * Copyright OAI Software Alliance
+ * Author Raphael Defosseux
+ * Comments 
+ */
 #include <stdio.h>
 
 int main()
