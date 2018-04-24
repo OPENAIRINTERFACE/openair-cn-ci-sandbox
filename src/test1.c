@@ -7,7 +7,7 @@
 
 int main()
 {
-    unsigned int testId = 1;
+//    unsigned int testId = 1;
     printf ("Test%d\n", testId);
 #ifdef _DEBUG
     char a[10];
