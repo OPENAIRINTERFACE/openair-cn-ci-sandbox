@@ -1,6 +1,8 @@
 // Comments
 pipeline {
-    agent any
+    agent {
+        label 'orion'
+    }
     options {
         disableConcurrentBuilds()
         timestamps()
@@ -11,6 +13,26 @@ pipeline {
             steps {
                 echo 'Verify Parameters'
                 echo "Base URL is ${JENKINS_URL}"
+            }
+        }
+        stage ('Compile') {
+            steps {
+                sh "cd $WORKSPACE; gcc -o bin/test1 src/test1.c"
+                sh "cd $WORKSPACE; cppcheck --enable=warning --force --xml --xml-version=2 src 2> cppcheck.xml"
+            }
+        }
+        stage ('Test') {
+            steps {
+                sh "cd $WORKSPACE; bin/test1"
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                if(fileExists('cppcheck.xml')) {
+                    archiveArtifacts artifacts: 'cppcheck.xml'
+                }
             }
         }
     }
