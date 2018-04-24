@@ -23,8 +23,6 @@ pipeline {
                 dir('src') {
                     sh "gcc -o ../bin/test1 test1.c"
                     sh "cppcheck --enable=warning --force --xml --xml-version=2 . 2> ../cppcheck.xml"
-                    //shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
-                    //echo "shortCommit is ${shortCommit}"
                 }
             }
         }
@@ -71,9 +69,6 @@ def updateGithubCommitStatus(build) {
     statusResultSource: [
       $class: 'ConditionalStatusResultSource',
       results: [
-//        [$class: 'BetterThanOrEqualBuildResult', result: 'SUCCESS', state: 'SUCCESS', message: build.description],
-//        [$class: 'BetterThanOrEqualBuildResult', result: 'FAILURE', state: 'FAILURE', message: build.description],
-//        [$class: 'AnyBuildResult', state: 'FAILURE', message: 'Loophole']
         [$class: 'AnyBuildResult', state: build.currentResult, message: build.description]
       ]
     ]
