@@ -13,6 +13,7 @@ int main()
     char a[10];
     a[10] = 0;
 #endif
+
 #ifdef _RELEASE
     int idx;
     int sum = 0;
