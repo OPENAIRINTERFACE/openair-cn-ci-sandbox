@@ -9,6 +9,7 @@ int main()
 {
     unsigned int testId = 1;
     printf ("Test%d\n", testId);
+// Debug
 #ifdef _DEBUG
     char a[10];
     a[10] = 0;
