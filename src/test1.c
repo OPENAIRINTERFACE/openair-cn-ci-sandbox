@@ -1,7 +1,7 @@
 /*
  * Copyright OAI Software Alliance
  * Author Raphael Defosseux
- * Comments 
+ * Comments : eigpiu
  */
 #include <stdio.h>
 
@@ -14,6 +14,7 @@ int main()
     char a[10];
     a[10] = 0;
 #endif
+// Release variant
 #ifdef _RELEASE
     int idx;
     int sum = 0;
