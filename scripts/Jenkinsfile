@@ -36,7 +36,6 @@ pipeline {
     }
     post {
         always {
-            echo "Build result is currentBuild.result"
             updateGithubCommitStatus(currentBuild)
         }
         success {
@@ -72,9 +71,10 @@ def updateGithubCommitStatus(build) {
     statusResultSource: [
       $class: 'ConditionalStatusResultSource',
       results: [
-        [$class: 'BetterThanOrEqualBuildResult', result: 'SUCCESS', state: 'SUCCESS', message: build.description],
+//        [$class: 'BetterThanOrEqualBuildResult', result: 'SUCCESS', state: 'SUCCESS', message: build.description],
 //        [$class: 'BetterThanOrEqualBuildResult', result: 'FAILURE', state: 'FAILURE', message: build.description],
-        [$class: 'AnyBuildResult', state: 'FAILURE', message: 'Loophole']
+//        [$class: 'AnyBuildResult', state: 'FAILURE', message: 'Loophole']
+        [$class: 'AnyBuildResult', state: build.currentBuild, message: build.description]
       ]
     ]
   ])
