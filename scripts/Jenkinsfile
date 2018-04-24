@@ -1,6 +1,8 @@
 // Comments
 pipeline {
-    agent any
+    agent {
+        label 'orion'
+    }
     options {
         disableConcurrentBuilds()
         timestamps()
@@ -10,8 +12,65 @@ pipeline {
         stage ('Verify Parameters') {
             steps {
                 echo 'Verify Parameters'
-                echo "Base URL is ${JENKINS_URL}"
+                echo "Base URL   is ${JENKINS_URL}"
+                echo "Git Branch is ${GIT_BRANCH}"
+                echo "Git Commit is ${GIT_COMMIT}"
+                echo "Git URL    is ${GIT_URL}"
+            }
+        }
+        stage ('Compile') {
+            steps {
+                dir('src') {
+                    sh "gcc -o ../bin/test1 test1.c"
+                    sh "cppcheck --enable=warning --force --xml --xml-version=2 . 2> ../cppcheck.xml"
+                }
+            }
+        }
+        stage ('Test') {
+            steps {
+                sh "cd $WORKSPACE; bin/test1"
             }
         }
     }
+    post {
+        always {
+            updateGithubCommitStatus(currentBuild)
+        }
+        success {
+            script {
+                if(fileExists('cppcheck.xml')) {
+                    archiveArtifacts artifacts: 'cppcheck.xml'
+                }
+            }
+        }
+    }
+}
+
+def getRepoURL() {
+  sh "git config --get remote.origin.url > .git/remote-url"
+  return readFile(".git/remote-url").trim()
+}
+ 
+def getCommitSha() {
+  sh "git rev-parse HEAD > .git/current-commit"
+  return readFile(".git/current-commit").trim()
+}
+ 
+def updateGithubCommitStatus(build) {
+  // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
+  repoUrl = getRepoURL()
+  commitSha = getCommitSha()
+ 
+  step([
+    $class: 'GitHubCommitStatusSetter',
+    reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+    commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
+    errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
+    statusResultSource: [
+      $class: 'ConditionalStatusResultSource',
+      results: [
+        [$class: 'AnyBuildResult', state: build.currentResult, message: build.description]
+      ]
+    ]
+  ])
 }
