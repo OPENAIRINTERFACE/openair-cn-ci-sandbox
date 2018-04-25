@@ -9,10 +9,12 @@
 
 int main()
 {
+// Intentional warning for CPPCHECK
     unsigned int testId = 1;
     printf ("Test%d\n", testId);
 // Debug Variant
 #ifdef _DEBUG
+// Intentional error for CPPCHECK
     char a[10];
     a[10] = 0;
 #endif
