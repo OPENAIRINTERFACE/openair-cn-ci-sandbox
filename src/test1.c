@@ -1,7 +1,7 @@
 /*
  * Copyright OAI Software Alliance
  * Author Raphael Defosseux
- * Comments : eigpiu
+ * Comments : Proper comments
  */
 #include <stdio.h>
 
