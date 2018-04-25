@@ -23,6 +23,7 @@ int main()
     for (idx = 0; idx < 10; idx++) {
         sum += idx;
     }
+
     printf ("Sum = %d\n", sum);
 #endif
     return 0;
