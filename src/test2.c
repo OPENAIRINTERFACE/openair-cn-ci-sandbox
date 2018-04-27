@@ -7,7 +7,7 @@
 
 int main()
 {
-    int testId = 1;
+    int testId = 2;
     printf ("Test%d\n", testId);
     return 0;
 }
