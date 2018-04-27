@@ -36,7 +36,9 @@ pipeline {
     }
     post {
         always {
-            updateGithubCommitStatus(currentBuild)
+            withCredentials([usernamePassword(credentialsId: '81610f81-0e2d-4c6a-b1fe-d1029ee65968', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                updateGithubCommitStatus(currentBuild)
+            }
         }
         success {
             script {
