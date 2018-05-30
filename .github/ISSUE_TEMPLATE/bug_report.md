@@ -13,8 +13,10 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Provision an end-date**
-Clarify a needed end-date for a bug-fix to be available
+**Provision an end-date based on a milestone**
+Clarify a needed end-date for a bug-fix to be available.
+ - Select an existing milestone that matches your expectation or
+ - Create a new milestone
 
 **Labels**
 One or more labels shall be added to the bug creation. The mandatory one shall be"bug". Others can show area of issue.
