@@ -9,6 +9,7 @@ int main()
 {
     int testId = 2;
 
+    // propoer use of signed int
     printf ("Test #%d\n", testId);
 
     return 0;
