@@ -11,7 +11,7 @@ int main()
 {
 // Intentional warning for CPPCHECK
     unsigned int testId = 1;
-    printf ("Test%d\n", testId);
+    printf ("Test%d for PR\n", testId);
 // Debug Variant
 #ifdef _DEBUG
 // Intentional error for CPPCHECK
