@@ -74,7 +74,7 @@ def updateGithubCommitStatus(build) {
   // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
   repoUrl = getRepoURL()
   commitSha = getCommitSha()
-  echo "${build.description}"
+  jobMsg = "no message"
  
   step([
     $class: 'GitHubCommitStatusSetter',
@@ -84,7 +84,7 @@ def updateGithubCommitStatus(build) {
     statusResultSource: [
       $class: 'ConditionalStatusResultSource',
       results: [
-        [$class: 'AnyBuildResult', state: build.currentResult, message: build.description]
+        [$class: 'AnyBuildResult', state: build.currentResult, message: jobMsg]
       ]
     ]
   ])
