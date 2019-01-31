@@ -24,8 +24,11 @@ pipeline {
                         echo "PR ID      is ${env.ghprbPullId}"
                         echo "PR LINK    is ${env.ghprbPullLink}"
                         echo "PR TITLE   is ${env.ghprbPullTitle}"
+                        echo "PR DESC    is ${env.ghprbPullDescription}"
                         echo "PR SRC BR  is ${env.ghprbSourceBranch}"
                         echo "PR TRG BR  is ${env.ghprbTargetBranch}"
+                        echo "PR SRC COM is ${env.ghprbActualCommit}"
+                        echo "PR SRC COM is ${env.sha1}"
                     }
                 }
             }
