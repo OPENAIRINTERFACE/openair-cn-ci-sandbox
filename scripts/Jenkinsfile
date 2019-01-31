@@ -18,6 +18,16 @@ pipeline {
                 echo "Git Branch is ${GIT_BRANCH}"
                 echo "Git Commit is ${GIT_COMMIT}"
                 echo "Git URL    is ${GIT_URL}"
+                script {
+                    if (env.ghprbPullId != null) {
+                        echo "======= THIS IS A PULL REQUEST ======"
+                        echo "PR ID      is ${env.ghprbPullId}"
+                        echo "PR LINK    is ${env.ghprbPullLink}"
+                        echo "PR TITLE   is ${env.ghprbPullTitle}"
+                        echo "PR SRC BR  is ${env.ghprbSourceBranch}"
+                        echo "PR TRG BR  is ${env.ghprbTargetBranch}"
+                    }
+                }
             }
         }
         stage ('Compile') {
@@ -64,6 +74,7 @@ def updateGithubCommitStatus(build) {
   // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
   repoUrl = getRepoURL()
   commitSha = getCommitSha()
+  echo "${build.description}"
  
   step([
     $class: 'GitHubCommitStatusSetter',
