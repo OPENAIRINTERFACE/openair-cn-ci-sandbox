@@ -1,2 +1,2 @@
 # openair-cn-ci-sandbox
-Temporary repository for OAI - CN CI acitivities
+Temporary repository for OAI - CN CI activities
