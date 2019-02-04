@@ -29,6 +29,11 @@ pipeline {
                         echo "PR TRG BR  is ${env.ghprbTargetBranch}"
                         echo "PR SRC COM is ${env.ghprbActualCommit}"
                         echo "PR SRC COM is ${env.sha1}"
+                        sh "git log -n1"
+                        sh "git show ${env.ghprbActualCommit}"
+                        sh "git config user.email \"jenkins@openairinterface.org\""
+                        sh "git config user.name \"OAI Jenkins\""
+                        sh "cat .git/config"
                     }
                 }
             }
