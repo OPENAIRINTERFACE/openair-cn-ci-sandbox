@@ -3,8 +3,6 @@
  * Author Raphael Defosseux
  * Comments : Proper comments
  * i do care
- * i DONT care
- * again
  */
 #include <stdio.h>
 
