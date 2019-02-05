@@ -15,25 +15,36 @@ pipeline {
             steps {
                 echo 'Verify Parameters'
                 echo "Base URL   is ${JENKINS_URL}"
-                echo "Git Branch is ${GIT_BRANCH}"
-                echo "Git Commit is ${GIT_COMMIT}"
                 echo "Git URL    is ${GIT_URL}"
                 script {
+                    removeGitHubInfo()
                     if (env.ghprbPullId != null) {
                         echo "======= THIS IS A PULL REQUEST ======"
                         echo "PR ID      is ${env.ghprbPullId}"
                         echo "PR LINK    is ${env.ghprbPullLink}"
                         echo "PR TITLE   is ${env.ghprbPullTitle}"
-                        echo "PR DESC    is ${env.ghprbPullDescription}"
                         echo "PR SRC BR  is ${env.ghprbSourceBranch}"
                         echo "PR TRG BR  is ${env.ghprbTargetBranch}"
                         echo "PR SRC COM is ${env.ghprbActualCommit}"
-                        echo "PR SRC COM is ${env.sha1}"
+                        echo "PR TRG COM is ${GIT_COMMIT}"
                         sh "git log -n1"
-                        sh "git show ${env.ghprbActualCommit}"
+                        // Going on the source branch and commit
+                        sh "git checkout -f ${env.ghprbActualCommit}"
+                        sh "git log -n1"
+                        // Making a hard copy of the SHA-ONE
+                        getCommitSha()
                         sh "git config user.email \"jenkins@openairinterface.org\""
                         sh "git config user.name \"OAI Jenkins\""
-                        sh "cat .git/config"
+                        // Doing a temporary merge w/ target branch
+                        sh "git merge --ff ${GIT_COMMIT} -m "Temporary merge for CI -- ${env.ghprbSourceBranch} to ${env.ghprbTargetBranch}"
+                        sh "git status"
+                        sh "git log -n1"
+                    } else {
+                        echo "======= THIS IS A PUSH EVENT ======"
+                        echo "Git Branch is ${GIT_BRANCH}"
+                        echo "Git Commit is ${GIT_COMMIT}"
+                        // Making a hard copy of the SHA-ONE
+                        getCommitSha()
                     }
                 }
             }
@@ -68,13 +79,26 @@ pipeline {
     }
 }
 
+def removeGitHubInfo() {
+  if (fileExists('.git/remote-url')) {
+    sh "rm -f .git/remote-url"
+  }
+  if (fileExists('.git/current-commit')) {
+    sh "rm -f .git/current-commit"
+  }
+}
+
 def getRepoURL() {
-  sh "git config --get remote.origin.url > .git/remote-url"
+  if (!fileExists('.git/remote-url')) {
+    sh "git config --get remote.origin.url > .git/remote-url"
+  }
   return readFile(".git/remote-url").trim()
 }
  
 def getCommitSha() {
-  sh "git rev-parse HEAD > .git/current-commit"
+  if (!fileExists('.git/current-commit')) {
+    sh "git rev-parse HEAD > .git/current-commit"
+  }
   return readFile(".git/current-commit").trim()
 }
  
