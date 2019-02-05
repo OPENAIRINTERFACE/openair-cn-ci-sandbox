@@ -2,7 +2,7 @@
  * Copyright OAI Software Alliance
  * Author Raphael Defosseux
  * Comments : Proper comments
- * i dont care
+ * i do care
  */
 #include <stdio.h>
 
