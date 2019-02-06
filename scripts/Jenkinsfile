@@ -33,6 +33,14 @@ pipeline {
                     }
                 }
             }
+            post {
+                failure {
+                    script {
+                        def message = "OAI " + JOB_NAME + " build (" + BUILD_ID + "): Merge Conflicts -- Cannot perform CI"
+                        updateGithubCommitStatus(currentBuild, message)
+                    }
+                }
+            }
         }
         stage ('Compile') {
             steps {
@@ -42,18 +50,31 @@ pipeline {
                     sh "cppcheck --enable=warning --force --xml --xml-version=2 . 2> ../cppcheck.xml"
                 }
             }
+            post {
+                always {
+                    script {
+                        def message = "Compile Stage"
+                        updateGithubCommitStatus(currentBuild, message)
+                    }
+                }
+            }
         }
         stage ('Test') {
             steps {
                 sh "cd $WORKSPACE; bin/test1"
                 sh "cd $WORKSPACE; bin/test2"
             }
+            post {
+                always {
+                    script {
+                        def message = "Compile Stage"
+                        updateGithubCommitStatus(currentBuild, message)
+                    }
+                }
+            }
         }
     }
     post {
-        always {
-            updateGithubCommitStatus(currentBuild)
-        }
         success {
             script {
                 if(fileExists('cppcheck.xml')) {
@@ -87,11 +108,9 @@ def getCommitSha() {
   return readFile(".git/current-commit").trim()
 }
  
-def updateGithubCommitStatus(build) {
-  // workaround https://issues.jenkins-ci.org/browse/JENKINS-38674
+def updateGithubCommitStatus(build, checkMessage) {
   repoUrl = getRepoURL()
   commitSha = getCommitSha()
-  jobMsg = "no message"
  
   step([
     $class: 'GitHubCommitStatusSetter',
@@ -101,7 +120,7 @@ def updateGithubCommitStatus(build) {
     statusResultSource: [
       $class: 'ConditionalStatusResultSource',
       results: [
-        [$class: 'AnyBuildResult', state: build.currentResult, message: jobMsg]
+        [$class: 'AnyBuildResult', state: build.currentResult, message: checkMessage]
       ]
     ]
   ])
