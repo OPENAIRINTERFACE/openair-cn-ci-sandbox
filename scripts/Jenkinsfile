@@ -87,6 +87,13 @@ pipeline {
         }
     }
     post {
+        always {
+            script {
+                if (env.ghprbPullId == null) {
+                    updateGithubCommitStatus(currentBuild, "Build finished.")
+                }
+            }
+        }
         success {
             script {
                 if(fileExists('cppcheck.xml')) {
