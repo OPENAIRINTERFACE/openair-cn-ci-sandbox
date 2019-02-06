@@ -36,8 +36,9 @@ pipeline {
             post {
                 failure {
                     script {
-                        def message = "OAI " + JOB_NAME + " build (" + BUILD_ID + "): Merge Conflicts -- Cannot perform CI"
-                        updateGithubCommitStatus(currentBuild, message)
+                        //def message = "OAI " + JOB_NAME + " build (" + BUILD_ID + "): Merge Conflicts -- Cannot perform CI"
+                        //updateGithubCommitStatus(currentBuild, message)
+                        githubNotify description: 'Merge Conflicts -- Cannot perform CI', status: 'FAILURE'
                     }
                 }
             }
@@ -51,10 +52,18 @@ pipeline {
                 }
             }
             post {
-                always {
+                success {
                     script {
-                        def message = "Compile Stage"
-                        updateGithubCommitStatus(currentBuild, message)
+                        //def message = "Compile Stage"
+                        //updateGithubCommitStatus(currentBuild, message)
+                        githubNotify description: 'Compile Stage', status: 'SUCCESS'
+                    }
+                }
+                failure {
+                    script {
+                        //def message = "Compile Stage"
+                        //updateGithubCommitStatus(currentBuild, message)
+                        githubNotify description: 'Compile Stage', status: 'FAILURE'
                     }
                 }
             }
@@ -65,10 +74,18 @@ pipeline {
                 sh "cd $WORKSPACE; bin/test2"
             }
             post {
-                always {
+                success {
                     script {
-                        def message = "Compile Stage"
-                        updateGithubCommitStatus(currentBuild, message)
+                        //def message = "Compile Stage"
+                        //updateGithubCommitStatus(currentBuild, message)
+                        githubNotify description: 'Compile Stage', status: 'SUCCESS'
+                    }
+                }
+                failure {
+                    script {
+                        //def message = "Compile Stage"
+                        //updateGithubCommitStatus(currentBuild, message)
+                        githubNotify description: 'Compile Stage', status: 'FAILURE'
                     }
                 }
             }
