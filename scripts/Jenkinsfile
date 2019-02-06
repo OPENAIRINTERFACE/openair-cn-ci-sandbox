@@ -142,5 +142,5 @@ def myOwnGitHubNotif(statusValue, contextMsg, descMsg) {
     repoUrl = getRepoURL()
     commitSha = getCommitSha()
     def myCreds = params.GitHubNotificationCredentials
-    githubNotify account: 'OPENAIRINTERFACE', credentialsId: myCreds, description: descMsg, repo: repoUrl, context: contextMsg, sha: commitSha, status: statusValue
+    githubNotify account: 'rdefosse', credentialsId: myCreds, description: descMsg, repo: repoUrl, context: contextMsg, sha: commitSha, status: statusValue
 }
