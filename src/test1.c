@@ -2,7 +2,7 @@
  * Copyright OAI Software Alliance 2019
  * Author Raphael Defosseux
  * Comments : Proper comments
- * i do care : ffff
+ * i do care : gggg
  */
 #include <stdio.h>
 
