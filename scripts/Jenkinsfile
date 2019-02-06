@@ -23,22 +23,7 @@ pipeline {
                         echo "PR ID      is ${env.ghprbPullId}"
                         echo "PR LINK    is ${env.ghprbPullLink}"
                         echo "PR TITLE   is ${env.ghprbPullTitle}"
-                        echo "PR SRC BR  is ${env.ghprbSourceBranch}"
-                        echo "PR TRG BR  is ${env.ghprbTargetBranch}"
-                        echo "PR SRC COM is ${env.ghprbActualCommit}"
-                        echo "PR TRG COM is ${GIT_COMMIT}"
-                        sh "git log -n1"
-                        // Going on the source branch and commit
-                        sh "git checkout -f ${env.ghprbActualCommit}"
-                        sh "git log -n1"
-                        // Making a hard copy of the SHA-ONE
-                        getCommitSha()
-                        sh "git config user.email \"jenkins@openairinterface.org\""
-                        sh "git config user.name \"OAI Jenkins\""
-                        // Doing a temporary merge w/ target branch
-                        sh "git merge --ff ${GIT_COMMIT} -m \"Temporary merge for CI -- ${env.ghprbSourceBranch} to ${env.ghprbTargetBranch}\""
-                        sh "git status"
-                        sh "git log -n1"
+                        sh "./scripts/doGitHubPullRequestTempMerge.sh --src-branch ${env.ghprbSourceBranch} --src-commit ${env.ghprbActualCommit} --target-branch ${env.ghprbTargetBranch} --target-commit ${GIT_COMMIT}"
                     } else {
                         echo "======= THIS IS A PUSH EVENT ======"
                         echo "Git Branch is ${GIT_BRANCH}"
