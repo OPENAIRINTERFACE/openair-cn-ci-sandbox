@@ -19,7 +19,7 @@ pipeline {
                 script {
                     removeGitHubInfo()
                     if (params.GitHubNotificationCredentials != null) {
-                        echo "There is Credentials : ${params.GitHubNotificationCredentials}"
+                        echo "There is Credentials!"
                     } else {
                         echo "There is no Credentials to do intermediate notifications on GitHub"
                     }
@@ -141,6 +141,6 @@ def updateGithubCommitStatus(build, checkMessage) {
 def myOwnGitHubNotif(statusValue, contextMsg, descMsg) {
     repoUrl = getRepoURL()
     commitSha = getCommitSha()
-    def myCreds = ${params.GitHubNotificationCredentials}
+    def myCreds = params.GitHubNotificationCredentials
     githubNotify account: 'rdefosse', credentialsId: myCreds, description: descMsg, repo: repoUrl, context: contextMsg, sha: commitSha, status: statusValue
 }
