@@ -36,9 +36,7 @@ pipeline {
             post {
                 failure {
                     script {
-                        //def message = "OAI " + JOB_NAME + " build (" + BUILD_ID + "): Merge Conflicts -- Cannot perform CI"
-                        //updateGithubCommitStatus(currentBuild, message)
-                        githubNotify description: 'Merge Conflicts -- Cannot perform CI', status: 'FAILURE'
+                        myOwnGitHubNotif('FAILURE', 'Parameter Check', 'Merge Conflicts -- Cannot perform CI')
                     }
                 }
             }
@@ -54,16 +52,12 @@ pipeline {
             post {
                 success {
                     script {
-                        //def message = "Compile Stage"
-                        //updateGithubCommitStatus(currentBuild, message)
-                        githubNotify description: 'Compile Stage', status: 'SUCCESS'
+                        myOwnGitHubNotif('SUCCESS', 'Compile Check', 'All Compiled')
                     }
                 }
                 failure {
                     script {
-                        //def message = "Compile Stage"
-                        //updateGithubCommitStatus(currentBuild, message)
-                        githubNotify description: 'Compile Stage', status: 'FAILURE'
+                        myOwnGitHubNotif('FAILURE', 'Compile Check', 'Some did NOT Compiled')
                     }
                 }
             }
@@ -76,16 +70,12 @@ pipeline {
             post {
                 success {
                     script {
-                        //def message = "Compile Stage"
-                        //updateGithubCommitStatus(currentBuild, message)
-                        githubNotify description: 'Compile Stage', status: 'SUCCESS'
+                        myOwnGitHubNotif('SUCCESS', 'Test Check', 'All Tests passed')
                     }
                 }
                 failure {
                     script {
-                        //def message = "Compile Stage"
-                        //updateGithubCommitStatus(currentBuild, message)
-                        githubNotify description: 'Compile Stage', status: 'FAILURE'
+                        myOwnGitHubNotif('FAILURE', 'Test Check', 'Some Tests failed')
                     }
                 }
             }
@@ -141,4 +131,10 @@ def updateGithubCommitStatus(build, checkMessage) {
       ]
     ]
   ])
+}
+
+def myOwnGitHubNotif(statusValue, contextMsg, descMsg) {
+    repoUrl = getRepoURL()
+    commitSha = getCommitSha()
+    githubNotify account: 'rdefosse', credentialsId: ${params.GitHubNotificationCredentials}, description: descMsg, repo: repoUrl, context: contextMsg, sha: commitSha, status: statusValue
 }
