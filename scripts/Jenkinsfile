@@ -18,6 +18,11 @@ pipeline {
                 echo "Git URL    is ${GIT_URL}"
                 script {
                     removeGitHubInfo()
+                    if (params.GitHubNotificationCredentials != null) {
+                        echo "There is Credentials : ${params.GitHubNotificationCredentials}"
+                    } else {
+                        echo "There is no Credentials to do intermediate notifications on GitHub"
+                    }
                     if (env.ghprbPullId != null) {
                         echo "======= THIS IS A PULL REQUEST ======"
                         echo "PR ID      is ${env.ghprbPullId}"
@@ -136,5 +141,6 @@ def updateGithubCommitStatus(build, checkMessage) {
 def myOwnGitHubNotif(statusValue, contextMsg, descMsg) {
     repoUrl = getRepoURL()
     commitSha = getCommitSha()
-    githubNotify account: 'rdefosse', credentialsId: ${params.GitHubNotificationCredentials}, description: descMsg, repo: repoUrl, context: contextMsg, sha: commitSha, status: statusValue
+    def myCreds = ${params.GitHubNotificationCredentials}
+    githubNotify account: 'rdefosse', credentialsId: myCreds, description: descMsg, repo: repoUrl, context: contextMsg, sha: commitSha, status: statusValue
 }
