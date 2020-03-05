@@ -6,6 +6,7 @@
  */
 #include <stdio.h>
 
+/* dummy comment */
 #define _RELEASE
 
 int main()
