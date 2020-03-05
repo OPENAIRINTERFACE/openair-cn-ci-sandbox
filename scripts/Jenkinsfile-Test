@@ -1,0 +1,62 @@
+#!/bin/groovy
+
+// Location of the executor node
+def nodeExecutor = params.nodeExecutor
+
+pipeline {
+  agent {
+    label nodeExecutor
+  }
+  options {
+    disableConcurrentBuilds()
+    timestamps()
+  }
+
+  stages {
+    stage ('Verify Parameters') {
+      steps {
+        echo 'Verify Parameters'
+        echo "Base URL   is ${JENKINS_URL}"
+        echo "Git URL    is ${GIT_URL}"
+        script {
+          if (env.ghprbPullId != null) {
+            echo "======= THIS IS A PULL REQUEST ======"
+            echo "PR ID      is ${env.ghprbPullId}"
+            echo "PR LINK    is ${env.ghprbPullLink}"
+            echo "PR TITLE   is ${env.ghprbPullTitle}"
+            sh "./scripts/doGitHubPullRequestTempMerge.sh --src-branch ${env.ghprbSourceBranch} --src-commit ${env.ghprbActualCommit} --target-branch ${env.ghprbTargetBranch} --target-commit ${GIT_COMMIT}"
+          } else {
+            echo "======= THIS IS A PUSH EVENT ======"
+            echo "Git Branch is ${GIT_BRANCH}"
+            echo "Git Commit is ${GIT_COMMIT}"
+            // Making a hard copy of the SHA-ONE
+            getCommitSha()
+          }
+        }
+      }
+    }
+  }
+}
+
+def removeGitHubInfo() {
+  if (fileExists('.git/remote-url')) {
+    sh "rm -f .git/remote-url"
+  }
+  if (fileExists('.git/current-commit')) {
+    sh "rm -f .git/current-commit"
+  }
+}
+
+def getRepoURL() {
+  if (!fileExists('.git/remote-url')) {
+    sh "git config --get remote.origin.url > .git/remote-url"
+  }
+  return readFile(".git/remote-url").trim()
+}
+
+def getCommitSha() {
+  if (!fileExists('.git/current-commit')) {
+    sh "git rev-parse HEAD > .git/current-commit"
+  }
+  return readFile(".git/current-commit").trim()
+}
