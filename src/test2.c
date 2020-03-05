@@ -3,6 +3,7 @@
  * Author Raphael Defosseux
  * Comments : Proper comments
  */
+
 #include <stdio.h>
 
 int main()
