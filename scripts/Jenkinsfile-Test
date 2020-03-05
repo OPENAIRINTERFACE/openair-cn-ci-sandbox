@@ -83,7 +83,8 @@ def getCommitSha() {
 
 def updateGithubCommitStatus(build, checkMessage) {
   repoUrl = getRepoURL()
-  commitSha = getCommitSha()
+  //commitSha = getCommitSha()
+  commitSha = GIT_COMMIT
 
   step([
     $class: 'GitHubCommitStatusSetter',
