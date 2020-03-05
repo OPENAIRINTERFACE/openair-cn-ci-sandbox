@@ -35,6 +35,15 @@ pipeline {
         }
       }
     }
+    stage ('Compile') {
+      steps {
+        dir('src') {
+          sh "gcc -o ../bin/test1 test1.c"
+          sh "gcc -o ../bin/test2 test2.c"
+          sh "cppcheck --enable=warning --force --xml --xml-version=2 . 2> ../cppcheck.xml"
+        }
+      }
+    }
   }
 }
 
