@@ -1,0 +1,155 @@
+//
+// Comments
+//
+pipeline {
+    agent {
+        label 'orion'
+    }
+    options {
+        disableConcurrentBuilds()
+        timestamps()
+    }
+    
+    stages {
+        stage ('Verify Parameters') {
+            steps {
+                echo 'Verify Parameters'
+                echo "Base URL   is ${JENKINS_URL}"
+                echo "Git URL    is ${GIT_URL}"
+                script {
+                    removeGitHubInfo()
+                    if (params.GitHubNotificationCredentials != null) {
+                        echo "There is Credentials!"
+                    } else {
+                        echo "There is no Credentials to do intermediate notifications on GitHub"
+                    }
+                    if (env.ghprbPullId != null) {
+                        echo "======= THIS IS A PULL REQUEST ======"
+                        echo "PR ID      is ${env.ghprbPullId}"
+                        echo "PR LINK    is ${env.ghprbPullLink}"
+                        echo "PR TITLE   is ${env.ghprbPullTitle}"
+                        sh "./scripts/doGitHubPullRequestTempMerge.sh --src-branch ${env.ghprbSourceBranch} --src-commit ${env.ghprbActualCommit} --target-branch ${env.ghprbTargetBranch} --target-commit ${GIT_COMMIT}"
+                    } else {
+                        echo "======= THIS IS A PUSH EVENT ======"
+                        echo "Git Branch is ${GIT_BRANCH}"
+                        echo "Git Commit is ${GIT_COMMIT}"
+                        // Making a hard copy of the SHA-ONE
+                        getCommitSha()
+                    }
+                }
+            }
+            post {
+                failure {
+                    script {
+                        myOwnGitHubNotif('FAILURE', 'Parameter Check', 'Merge Conflicts -- Cannot perform CI')
+                    }
+                }
+            }
+        }
+        stage ('Compile') {
+            steps {
+                dir('src') {
+                    sh "gcc -o ../bin/test1 test1.c"
+                    sh "gcc -o ../bin/test2 test2.c"
+                    sh "cppcheck --enable=warning --force --xml --xml-version=2 . 2> ../cppcheck.xml"
+                }
+            }
+            post {
+                success {
+                    script {
+                        myOwnGitHubNotif('SUCCESS', 'Compile Check', 'All Compiled')
+                    }
+                }
+                failure {
+                    script {
+                        myOwnGitHubNotif('FAILURE', 'Compile Check', 'Some did NOT Compiled')
+                    }
+                }
+            }
+        }
+        stage ('Test') {
+            steps {
+                sh "cd $WORKSPACE; bin/test1"
+                sh "cd $WORKSPACE; bin/test2"
+            }
+            post {
+                success {
+                    script {
+                        myOwnGitHubNotif('SUCCESS', 'Test Check', 'All Tests passed')
+                    }
+                }
+                failure {
+                    script {
+                        myOwnGitHubNotif('FAILURE', 'Test Check', 'Some Tests failed')
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                if (env.ghprbPullId == null) {
+                    updateGithubCommitStatus(currentBuild, "Build finished.")
+                }
+            }
+        }
+        success {
+            script {
+                if(fileExists('cppcheck.xml')) {
+                    archiveArtifacts artifacts: 'cppcheck.xml'
+                }
+            }
+        }
+    }
+}
+
+def removeGitHubInfo() {
+  if (fileExists('.git/remote-url')) {
+    sh "rm -f .git/remote-url"
+  }
+  if (fileExists('.git/current-commit')) {
+    sh "rm -f .git/current-commit"
+  }
+}
+
+def getRepoURL() {
+  if (!fileExists('.git/remote-url')) {
+    sh "git config --get remote.origin.url > .git/remote-url"
+  }
+  return readFile(".git/remote-url").trim()
+}
+ 
+def getCommitSha() {
+  if (!fileExists('.git/current-commit')) {
+    sh "git rev-parse HEAD > .git/current-commit"
+  }
+  return readFile(".git/current-commit").trim()
+}
+ 
+def updateGithubCommitStatus(build, checkMessage) {
+  repoUrl = getRepoURL()
+  commitSha = getCommitSha()
+ 
+  step([
+    $class: 'GitHubCommitStatusSetter',
+    reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+    commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
+    errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
+    statusResultSource: [
+      $class: 'ConditionalStatusResultSource',
+      results: [
+        [$class: 'AnyBuildResult', state: build.currentResult, message: checkMessage]
+      ]
+    ]
+  ])
+}
+
+def myOwnGitHubNotif(statusValue, contextMsg, descMsg) {
+    repoUrl = getRepoURL()
+    commitSha = getCommitSha()
+    def myCreds = params.GitHubNotificationCredentials
+    def myRepo = 'openair-cn-ci-sandbox'
+    def myAccount = 'OPENAIRINTERFACE'
+    githubNotify account: myAccount, credentialsId: myCreds, description: descMsg, repo: myRepo, context: contextMsg, sha: commitSha, status: statusValue
+}
