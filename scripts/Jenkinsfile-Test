@@ -46,6 +46,16 @@ pipeline {
       }
     }
   }
+  post {
+    always {
+      script {
+        // Updating the commit status only in case of push
+        if (env.ghprbPullId == null) {
+          updateGithubCommitStatus(currentBuild, "Build finished.")
+        }
+      }
+    }
+  }
 }
 
 def removeGitHubInfo() {
@@ -69,4 +79,22 @@ def getCommitSha() {
     sh "git rev-parse HEAD > .git/current-commit"
   }
   return readFile(".git/current-commit").trim()
+}
+
+def updateGithubCommitStatus(build, checkMessage) {
+  repoUrl = getRepoURL()
+  commitSha = getCommitSha()
+
+  step([
+    $class: 'GitHubCommitStatusSetter',
+    reposSource: [$class: "ManuallyEnteredRepositorySource", url: repoUrl],
+    commitShaSource: [$class: "ManuallyEnteredShaSource", sha: commitSha],
+    errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
+    statusResultSource: [
+      $class: 'ConditionalStatusResultSource',
+      results: [
+        [$class: 'AnyBuildResult', state: build.currentResult, message: checkMessage]
+      ]
+    ]
+  ])
 }
