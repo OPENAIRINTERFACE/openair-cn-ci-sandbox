@@ -19,6 +19,14 @@ pipeline {
         echo "Base URL   is ${JENKINS_URL}"
         echo "Git URL    is ${GIT_URL}"
         script {
+          for (cause in bld.getCauses()) {
+            if (cause instanceof SCMTrigger.SCMTriggerCause) {
+              echo cause.getShortDescription()
+            }
+            if (cause instanceof Cause.UpstreamCause) {
+              echo cause.getShortDescription()
+            }
+          }
           if (env.ghprbPullId != null) {
             echo "======= THIS IS A PULL REQUEST ======"
             echo "PR ID      is ${env.ghprbPullId}"
