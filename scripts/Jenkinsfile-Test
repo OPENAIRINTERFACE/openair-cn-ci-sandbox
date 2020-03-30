@@ -23,7 +23,7 @@ pipeline {
             if (cause instanceof hudson.triggers.SCMTrigger.SCMTriggerCause) {
               echo cause.getShortDescription()
             }
-            if (cause instanceof hudson.triggers.Cause.UpstreamCause) {
+            if (cause instanceof hudson.model.Cause.UpstreamCause) {
               echo cause.getShortDescription()
             }
           }
