@@ -21,10 +21,12 @@ pipeline {
         script {
           for (cause in currentBuild.getBuildCauses()) {
             if (cause instanceof hudson.triggers.SCMTrigger.SCMTriggerCause) {
-              echo cause.getShortDescription()
+              echo "RD: triggered by SCM"
+              echo 'the cause is ' + cause.getShortDescription()
             }
             if (cause instanceof hudson.model.Cause.UpstreamCause) {
-              echo cause.getShortDescription()
+              echo "RD: triggered by upstream job"
+              echo 'the cause is ' + cause.getShortDescription()
             }
           }
           if (env.ghprbPullId != null) {
