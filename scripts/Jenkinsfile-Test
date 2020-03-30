@@ -19,7 +19,8 @@ pipeline {
         echo "Base URL   is ${JENKINS_URL}"
         echo "Git URL    is ${GIT_URL}"
         script {
-          for (cause in bld.getCauses()) {
+          def build = currentBuild.rawBuild
+          for (cause in build.getCauses()) {
             if (cause instanceof hudson.triggers.SCMTrigger.SCMTriggerCause) {
               echo cause.getShortDescription()
             }
