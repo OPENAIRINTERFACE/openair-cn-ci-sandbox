@@ -20,10 +20,10 @@ pipeline {
         echo "Git URL    is ${GIT_URL}"
         script {
           for (cause in bld.getCauses()) {
-            if (cause instanceof SCMTrigger.SCMTriggerCause) {
+            if (cause instanceof hudson.triggers.SCMTrigger.SCMTriggerCause) {
               echo cause.getShortDescription()
             }
-            if (cause instanceof Cause.UpstreamCause) {
+            if (cause instanceof hudson.triggers.Cause.UpstreamCause) {
               echo cause.getShortDescription()
             }
           }
