@@ -3,6 +3,9 @@
 // Location of the executor node
 def nodeExecutor = params.nodeExecutor
 
+def scmEvent = false
+def upstreamEvent = false
+
 pipeline {
   agent {
     label nodeExecutor
@@ -19,32 +22,49 @@ pipeline {
         echo "Base URL   is ${JENKINS_URL}"
         echo "Git URL    is ${GIT_URL}"
         script {
+// [{"_class":"org.jenkinsci.plugins.ghprb.GhprbCause","shortDescription":"GitHub pull request #25 of commit 3178447e30b85db2a21ced7ac90fce9c21b33b8b, no merge conflicts."}]
+// {"_class":"com.cloudbees.jenkins.GitHubPushCause","shortDescription":"Started by GitHub push by rdefosse"}
+// [{"_class":"hudson.model.Cause$UpstreamCause","shortDescription":"Started by upstream project \"CI-Sandbox4\" build number 175","upstreamBuild":175,"upstreamProject":"CI-Sandbox4","upstreamUrl":"job/CI-Sandbox4/"}]
+// cause is {"_class":"com.dabsquared.gitlabjenkins.cause.GitLabWebHookCause","shortDescription":"Started by GitLab push by Raphael Defosseux"}
+
           def causes = currentBuild.getBuildCauses()
-          echo "causes count: " + causes.size().toString()
-          echo "causes text : " + causes.toString()
+          //echo "causes count: " + causes.size().toString()
+          //echo "causes text : " + causes.toString()
           for (cause in causes) {
-            echo "cause is " + cause.toString() 
-            if (cause instanceof hudson.triggers.SCMTrigger.SCMTriggerCause) {
-              echo "RD: triggered by SCM"
-              echo 'the cause is ' + cause.getShortDescription()
-            }
-            if (cause instanceof hudson.model.Cause.UpstreamCause) {
-              echo "RD: triggered by upstream job"
-              echo 'the cause is ' + cause.getShortDescription()
+            //echo "cause is " + cause.toString() 
+            //if (cause instanceof hudson.triggers.SCMTrigger.SCMTriggerCause) {
+            //  echo "RD: triggered by SCM"
+            //  echo 'the cause is ' + cause.getShortDescription()
+            //}
+            //if (cause instanceof hudson.model.Cause.UpstreamCause) {
+            //  echo "RD: triggered by upstream job"
+            //  echo 'the cause is ' + cause.getShortDescription()
+            //}
+            if (cause.toString() ==~ /.*GitHubPushCause.*/) {
+              echo "RD: the cause is a push"
+              scmEvent = true
+            } else if (cause.toString() ==~ /.*GhprbCause.*/) {
+              echo "RD: the cause is a pull request event"
+              scmEvent = true
+            } else if (cause.toString() ==~ /.*UpstreamCause.*/) {
+              echo "RD: the cause is a upstream job"
+              upstreamEvent = true
             }
           }
-          if (env.ghprbPullId != null) {
-            echo "======= THIS IS A PULL REQUEST ======"
-            echo "PR ID      is ${env.ghprbPullId}"
-            echo "PR LINK    is ${env.ghprbPullLink}"
-            echo "PR TITLE   is ${env.ghprbPullTitle}"
-            sh "./scripts/doGitHubPullRequestTempMerge.sh --src-branch ${env.ghprbSourceBranch} --src-commit ${env.ghprbActualCommit} --target-branch ${env.ghprbTargetBranch} --target-commit ${GIT_COMMIT}"
-          } else {
-            echo "======= THIS IS A PUSH EVENT ======"
-            echo "Git Branch is ${GIT_BRANCH}"
-            echo "Git Commit is ${GIT_COMMIT}"
-            // Making a hard copy of the SHA-ONE
-            getCommitSha()
+          if (scmEvent) {
+            if (env.ghprbPullId != null) {
+              echo "======= THIS IS A PULL REQUEST ======"
+              echo "PR ID      is ${env.ghprbPullId}"
+              echo "PR LINK    is ${env.ghprbPullLink}"
+              echo "PR TITLE   is ${env.ghprbPullTitle}"
+              sh "./scripts/doGitHubPullRequestTempMerge.sh --src-branch ${env.ghprbSourceBranch} --src-commit ${env.ghprbActualCommit} --target-branch ${env.ghprbTargetBranch} --target-commit ${GIT_COMMIT}"
+            } else {
+              echo "======= THIS IS A PUSH EVENT ======"
+              echo "Git Branch is ${GIT_BRANCH}"
+              echo "Git Commit is ${GIT_COMMIT}"
+              // Making a hard copy of the SHA-ONE
+              getCommitSha()
+            }
           }
         }
       }
@@ -56,6 +76,14 @@ pipeline {
           //sh "gcc -o ../bin/test1 test1.c"
           //sh "gcc -o ../bin/test2 test2.c"
           //sh "cppcheck --enable=warning --force --xml --xml-version=2 . 2> ../cppcheck.xml"
+          script {
+            if (scmEvent) {
+              echo "  building when scm event"
+            }
+            if (upstreamEvent) {
+              echo "  building when upstream event"
+            }
+          }
         }
       }
     }
