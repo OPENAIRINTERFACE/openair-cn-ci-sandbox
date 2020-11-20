@@ -1,5 +1,9 @@
 #!/bin/groovy
 
+def GIT_URL = "github.com/OPENAIRINTERFACE/openair-cn-ci-sandbox"
+def GIT_BRANCH = "master"
+def GIT_COMMIT
+
 // Location of the executor node
 def nodeExecutor = params.nodeExecutor
 
