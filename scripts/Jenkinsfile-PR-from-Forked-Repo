@@ -1,0 +1,37 @@
+#!/bin/groovy
+
+// Location of the executor node
+def nodeExecutor = params.nodeExecutor
+
+pipeline {
+  agent {
+    label nodeExecutor
+  }
+  options {
+    disableConcurrentBuilds()
+    timestamps()
+    ansiColor('xterm')
+  }
+  stages {
+    stage ("Verify Parameters") {
+      steps {
+        script {
+          cleanWs()
+          JOB_TIMESTAMP = sh returnStdout: true, script: 'date --utc --rfc-3339=seconds | sed -e "s#+00:00##"'
+          JOB_TIMESTAMP = JOB_TIMESTAMP.trim()
+        }
+      }
+    }
+    stage ("Retrieve and Prepare Source Code") {
+      steps {
+        script {
+            checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: '${sha1}']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', url: "https://" + GIT_URL + ".git"]]]
+            sh "git clean -x -d -f > /dev/null 2>&1"
+            TEMP_COMMIT = sh returnStdout: true, script: 'git log -n1 --pretty=format:"%H"'
+            TEMP_COMMIT = TEMP_COMMIT.trim()
+            echo "$TEMP_COMMIT"
+        }
+      }
+    }
+  }
+}
