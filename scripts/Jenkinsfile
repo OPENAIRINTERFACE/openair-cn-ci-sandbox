@@ -146,6 +146,7 @@ def updateGithubCommitStatus(build, checkMessage) {
 }
 
 def myOwnGitHubNotif(statusValue, contextMsg, descMsg) {
+// Disabling
 //    repoUrl = getRepoURL()
 //    commitSha = getCommitSha()
 //    def myCreds = params.GitHubNotificationCredentials
