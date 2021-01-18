@@ -146,10 +146,10 @@ def updateGithubCommitStatus(build, checkMessage) {
 }
 
 def myOwnGitHubNotif(statusValue, contextMsg, descMsg) {
-    repoUrl = getRepoURL()
-    commitSha = getCommitSha()
-    def myCreds = params.GitHubNotificationCredentials
-    def myRepo = 'openair-cn-ci-sandbox'
-    def myAccount = 'OPENAIRINTERFACE'
-    githubNotify account: myAccount, credentialsId: myCreds, description: descMsg, repo: myRepo, context: contextMsg, sha: commitSha, status: statusValue
+//    repoUrl = getRepoURL()
+//    commitSha = getCommitSha()
+//    def myCreds = params.GitHubNotificationCredentials
+//    def myRepo = 'openair-cn-ci-sandbox'
+//    def myAccount = 'OPENAIRINTERFACE'
+//    githubNotify account: myAccount, credentialsId: myCreds, description: descMsg, repo: myRepo, context: contextMsg, sha: commitSha, status: statusValue
 }
