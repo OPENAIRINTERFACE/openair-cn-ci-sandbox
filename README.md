@@ -6,6 +6,6 @@ Temporary repository for OAI - CN CI acitivities
 
 ---
 
-Copyright OSA 2021
+Copyright -- OSA 2021
 
 Author Raphael Defosseux with Mohammed Ismail
